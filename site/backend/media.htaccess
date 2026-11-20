@@ -1,0 +1,22 @@
+# Uploaded images only. Nothing in this folder may ever be executed as code.
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<FilesMatch "\.(?i:php|phtml|phar|pl|py|cgi|sh)$">
+    Require all denied
+</FilesMatch>
+Options -ExecCGI -Indexes
+RemoveHandler .php .phtml .phar
+
+# Uploaded SVG files are code: they may draw, but nothing inside them can run.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(?i:svg)$">
+        Header set Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; sandbox"
+    </FilesMatch>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
+
+# File names are content hashes or UUIDs, so an image never changes under the same URL.
+<IfModule mod_headers.c>
+    Header set Cache-Control "public, max-age=31536000, immutable"
+</IfModule>

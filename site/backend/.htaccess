@@ -1,0 +1,9 @@
+# The Laravel application folder is never served to browsers (vendor/, .env, storage/, ...).
+# Only <web root>/index.php may reach it. This matters when the app sits inside the web folder.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+</IfModule>

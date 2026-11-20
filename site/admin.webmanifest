@@ -1,0 +1,13 @@
+{
+  "name": "PRIHIKA Admin",
+  "short_name": "PRIHIKA Admin",
+  "description": "Orders and the shop dashboard for PRIHIKA.",
+  "start_url": "/admin/orders",
+  "scope": "/admin/",
+  "display": "standalone",
+  "background_color": "#f1f1f1",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    { "src": "/favicon.png", "sizes": "250x250", "type": "image/png", "purpose": "any" }
+  ]
+}
