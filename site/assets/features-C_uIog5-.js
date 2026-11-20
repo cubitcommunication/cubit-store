@@ -1,0 +1,1 @@
+import{t as e}from"./useQuery-Bk2pr1Qd.js";import{n as t}from"./api-JFhh0wYW.js";function n(){return{offlineShop:e({queryKey:[`admin`,`features`],queryFn:async()=>(await t(`/admin/features`)).features,staleTime:3e5,retry:!1}).data?.offline_shop===!0}}export{n as t};

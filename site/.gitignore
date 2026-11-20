@@ -1,0 +1,14 @@
+# Things that live on the server only and must survive every pull.
+/media
+/backend/.env
+/backend/storage/logs/*
+/backend/storage/framework/cache/data/*
+/backend/storage/framework/sessions/*
+/backend/storage/framework/views/*
+/backend/storage/framework/release.txt
+/backend/storage/framework/update*
+/backend/bootstrap/cache/*.php
+/error_log
+/.well-known
+/cgi-bin
+/default.php
