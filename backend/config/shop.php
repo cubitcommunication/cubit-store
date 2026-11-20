@@ -19,6 +19,19 @@ return [
     'features' => [
         // Offline shop: Quick sell by barcode, barcode / piece labels, shop customers, online vs shop reports.
         'offline_shop' => (bool) env('FEATURE_OFFLINE_SHOP', false),
+        // External storefront API: lets a client's own (hand-built or static) website read this catalogue and
+        // write its orders here, so the site keeps its design and the admin gets the orders, stock and coupons.
+        'external_storefront' => (bool) env('FEATURE_EXTERNAL_STOREFRONT', false),
+    ],
+
+    // Settings for that external storefront API (only read while the add-on above is on).
+    'storefront_api' => [
+        // Comma-separated list of origins allowed to call it, exactly as a browser sends them,
+        // e.g. "https://example.com,https://www.example.com". Empty means browsers are refused.
+        'origins' => (string) env('STOREFRONT_API_ORIGINS', ''),
+        // A WhatsApp checkout often has no e-mail address. The phone number then becomes the customer's
+        // stand-in address at this domain, so their orders and coupon limits still line up.
+        'phone_email_domain' => (string) env('STOREFRONT_API_PHONE_EMAIL_DOMAIN', 'phone.invalid'),
     ],
 
     // Admin session cookie.

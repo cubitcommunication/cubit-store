@@ -50,6 +50,14 @@ shared hosting. GitHub Actions (`.github/workflows/deploy.yml`) builds the site 
 - Returns (`return_requests`, `App\Support\Returns`, `Admin\ReturnController`) are OFF by default (`commerce_returns_enabled`); the window
   counts from `orders.fulfilled_at`. Every change to a piece's quantity goes through `App\Support\StockLog` (`stock_adjustments`) so the
   Inventory screen can show history; never update `stock_quantity` without logging it.
+- A client's own website (hand-built or static, on another domain) can use this store as its backend through the
+  **external storefront API**: `GET /api/public/products`, `GET /api/public/coupon`, `POST /api/public/order`
+  (`StorefrontApiController`). It is the one group of routes outside `same-origin`, so `App\Http\Middleware\StorefrontApi`
+  guards it instead: the `external_storefront` add-on must be on (`FEATURE_EXTERNAL_STOREFRONT`), the caller's origin must be
+  in `STOREFRONT_API_ORIGINS`, and the CORS headers go out only for those origins. A cart line from such a site is
+  `{id, q, n}`: product slug, pack size (the variant) and how many packs. Prices, discounts and stock are re-read here
+  through `Commerce::quote` and `OrderService::place`, never taken from the caller. Keep it that way, and keep the
+  response shape stable: client sites in the wild depend on it.
 - Reports (`Admin\ReportController`) and the Google/Meta product feed (`/api/feeds/products.xml`, `ProductFeedController`) are read-only.
 - Loading states use the shimmering `.skel` class (`components/ui/loading-rows.tsx`, `skeleton.tsx`), not "Loading…" text.
 
