@@ -1,0 +1,127 @@
+name: Build the site
+
+# Runs on every push to main (and can be started by hand from the Actions tab).
+#
+# It tests the project, builds the React app, installs the PHP dependencies and saves the finished website in the
+# `site/` folder of the SAME branch (main), as one extra commit made by the workflow. Hostinger's own Git feature
+# (hPanel -> Advanced -> Git, branch main) only has to pull main: the repository's root .htaccess hands every request to
+# site/. No SSH, no passwords, no GitHub secrets and no second branch: the workflow writes with its built-in token.
+#
+# On the server, the first request after a pull finishes the update by itself (new database tables, refreshed caches):
+# see backend/app/Support/Updater.php.
+
+on:
+  push:
+    branches: [main, stable]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-site-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Test and build the React app
+        working-directory: frontend
+        run: |
+          npm install --no-audit --no-fund   # honours package-lock.json; plain "npm ci" trips on an npm ajv/lockfile quirk
+          npm test
+          npm run build   # type-checks first, then builds and renames index.html -> app.html
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, pdo_mysql, pdo_sqlite, fileinfo, gd, openssl
+          tools: composer:v2
+
+      - name: Test the API
+        working-directory: backend
+        run: |
+          composer install --no-interaction --prefer-dist
+          cp .env.example .env
+          php artisan key:generate
+          php artisan test
+
+      - name: Install PHP dependencies (production only)
+        working-directory: backend
+        run: |
+          rm -f .env
+          composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+      # The built site mirrors what a web root holds (it becomes site/):
+      #   index.php, .htaccess, app.html, assets/ ...   the website (React build + Laravel entry point)
+      #   backend/                                      the Laravel app with vendor/ (blocked from the web by backend/.htaccess)
+      # Uploads (media/), backend/.env and backend/storage/ runtime files are never part of it.
+      - name: Assemble the release
+        run: |
+          mkdir -p release/backend
+          rsync -a \
+            --exclude='/public' --exclude='/tests' --exclude='/node_modules' --exclude='/.env' --exclude='/.env.*' \
+            --exclude='/storage/logs/*' --exclude='/storage/framework/cache/data/*' \
+            --exclude='/storage/framework/sessions/*' --exclude='/storage/framework/views/*' \
+            --exclude='/bootstrap/cache/*.php' \
+            backend/ release/backend/
+          # Keep the .env.example (a new site's installer reads it); only real .env files are excluded above.
+          cp backend/.env.example release/backend/.env.example
+          cp backend/public/index.php backend/public/.htaccess release/
+          cp -r frontend/dist/. release/
+          # Rules that stop uploaded files from running as code; the server copies them into media/ (Updater::prepareUploads).
+          cp backend/public/media/.htaccess release/backend/media.htaccess
+          # Which commit this release was built from: the server compares it to know when an update is due.
+          echo "$GITHUB_SHA" > release/backend/RELEASE
+          cat > release/.gitignore <<'EOF'
+          # Things that live on the server only and must survive every pull.
+          /media
+          /backend/.env
+          /backend/storage/logs/*
+          /backend/storage/framework/cache/data/*
+          /backend/storage/framework/sessions/*
+          /backend/storage/framework/views/*
+          /backend/storage/framework/release.txt
+          /backend/storage/framework/update*
+          /backend/bootstrap/cache/*.php
+          /error_log
+          /.well-known
+          /cgi-bin
+          /default.php
+          EOF
+
+      # The finished website is saved as site/ on main. The commit is made by the workflow itself and carries [skip ci],
+      # so it does not start another build. site/ is generated: never edit it by hand.
+      - name: Save the built site in site/ on main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p site
+          rsync -a --delete --exclude='/.git' release/ site/
+          git add -A -f site   # -f: some vendor packages ship a .gitignore that would hide files the app needs
+          if git diff --cached --quiet; then
+            echo "Nothing changed in site/."
+          else
+            git commit -q -m "Build site ${GITHUB_SHA::7} [skip ci]" -m "Generated by GitHub Actions from ${GITHUB_SHA}. Do not edit site/ by hand."
+            # The build machine may have touched tracked files (for example package-lock.json). They are not wanted
+            # in the repository, and git refuses to pull while they are changed.
+            git checkout -- .
+            git pull --rebase -q origin "$GITHUB_REF_NAME"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+          echo "### Site saved" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`site/\` on \`main\` now holds the build of \`${GITHUB_SHA::7}\`. Hostinger pulls it (hPanel -> Advanced -> Git -> Deploy, or automatically through the webhook)." >> "$GITHUB_STEP_SUMMARY"

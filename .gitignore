@@ -1,0 +1,48 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependencies and build output
+node_modules
+vendor
+vendor_broken_delete_me
+dist
+.tanstack/**
+*.local
+
+# Laravel
+backend/.env
+backend/.env.backup
+backend/.phpunit.result.cache
+backend/storage/*.key
+backend/storage/logs/*
+backend/storage/framework/cache/data/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+!backend/storage/**/.gitignore
+backend/bootstrap/cache/*.php
+
+# The built React app is copied into backend/public by the build; it is never committed.
+backend/public/app.html
+backend/public/assets
+backend/public/images
+backend/public/diwali
+backend/public/favicon.*
+backend/public/robots.txt
+
+# Uploaded images live on the server (backend/public/media). Never commit uploads;
+# the original catalogue photos are versioned in backend/database/seed/media instead.
+backend/public/media/*
+!backend/public/media/.htaccess
+
+# Temporary snapshots
+_live
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.sw?

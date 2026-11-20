@@ -1,0 +1,122 @@
+import { brand } from "@/config/brand";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { AdminShell } from "@/components/admin/AdminShell";
+
+export const Route = createFileRoute("/admin/help")({
+  head: () => ({
+    meta: [
+      { title: `Help — ${brand.name} Admin` },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
+  component: HelpPage,
+});
+
+const guides = [
+  {
+    title: "ADD A PRODUCT",
+    steps: [
+      "Go to Products and press ADD PRODUCT.",
+      "Fill in the name, SKU, price, description, category, material, occasion and where to wear it.",
+      "Upload photos and drag them into the order you want.",
+      "Tick Featured or New arrival if it belongs there.",
+      "Tick Published and press SAVE CHANGES. It appears on the website straight away.",
+    ],
+  },
+  {
+    title: "CHANGE OR REMOVE A PRODUCT",
+    steps: [
+      "Go to Products, search for the piece and press EDIT.",
+      "Change anything you like, then press SAVE CHANGES.",
+      "Untick Published to hide it while keeping it saved (UNPUBLISH).",
+      "DELETE moves it to Archived — nothing is lost, and you can restore it from the Archived filter.",
+    ],
+  },
+  {
+    title: "CHANGE A BANNER OR SECTION PICTURE",
+    steps: [
+      "Go to Online store → Pages and open the page, for example Home page. Click the section with the picture, such as Home hero.",
+      "Press CHOOSE FROM MEDIA (or UPLOAD) next to the picture, then publish the page. The website uses it immediately.",
+      "The home hero has a separate picture for phones — change that one too.",
+      "Material page pictures are in Products → Categories. Founder photos are in the About page, in the team section.",
+    ],
+  },
+  {
+    title: "CHANGE HOMEPAGE WORDING",
+    steps: [
+      "Go to Online store → Pages and open the Home page.",
+      "Click a section to edit its heading, text and buttons. The announcement strip is in Online store → Header & footer.",
+      "Press SAVE CHANGES.",
+    ],
+  },
+  {
+    title: "CHANGE PHONE, EMAIL OR SOCIAL LINKS",
+    steps: [
+      "Go to Website content → Contact & social.",
+      "Update the phone number, WhatsApp number, email, Instagram, Facebook or website address.",
+      "Press SAVE CHANGES — the header, footer, contact page and every WhatsApp button update together.",
+    ],
+  },
+  {
+    title: "MANAGE COLLECTIONS AND CATEGORIES",
+    steps: [
+      "Go to Collections to add, rename or describe a collection.",
+      "Go to Categories to manage the main groups of your shop.",
+      "Assign a product to a collection while editing that product.",
+    ],
+  },
+  {
+    title: "CHANGE THE MENU",
+    steps: [
+      "Go to Website content → Navigation.",
+      "Rename an item, move it up or down, or untick Shown to hide it.",
+      "Main pages cannot be removed, so the menu can never break.",
+    ],
+  },
+  {
+    title: "MAKE A BACKUP",
+    steps: [
+      "Go to Export / backup.",
+      "Download the catalogue as a spreadsheet file (CSV) or a data file (JSON).",
+      "Keep a copy on your own computer or drive — do this before any big change.",
+    ],
+  },
+  {
+    title: "CHANGE YOUR PASSWORD",
+    steps: [
+      "Go to Settings → Change password.",
+      "Type a new password twice and press SAVE CHANGES.",
+      "Forgotten it? Use the reset link on the sign-in screen and check your email.",
+    ],
+  },
+];
+
+function HelpPage() {
+  return (
+    <AdminShell title="Help & guide">
+      <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+        Short instructions for everything you can do here. Nothing on this page needs
+        code, and nothing you save requires a new deployment.
+      </p>
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        {guides.map((g) => (
+          <section key={g.title} className="border border-border bg-background p-6">
+            <h2 className="eyebrow">{g.title}</h2>
+            <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+              {g.steps.map((s) => (
+                <li key={s}>{s}</li>
+              ))}
+            </ol>
+          </section>
+        ))}
+      </div>
+      <p className="mt-6 text-sm text-muted-foreground">
+        Start with{" "}
+        <Link to="/admin/dashboard" className="underline hover:text-brand-red">
+          the dashboard
+        </Link>
+        .
+      </p>
+    </AdminShell>
+  );
+}

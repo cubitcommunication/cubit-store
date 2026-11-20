@@ -1,0 +1,784 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@theme inline {
+  --font-display: "Cinzel", Georgia, serif;
+  --font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+:root {
+  --radius: 0rem;
+  --background: oklch(0.994 0 0);
+  --foreground: oklch(0 0 0);
+  --card: oklch(0.994 0 0);
+  --card-foreground: oklch(0 0 0);
+  --popover: oklch(0.994 0 0);
+  --popover-foreground: oklch(0 0 0);
+  --primary: oklch(0 0 0);
+  --primary-foreground: oklch(0.994 0 0);
+  --secondary: oklch(0.962 0 0);
+  --secondary-foreground: oklch(0 0 0);
+  --muted: oklch(0.962 0 0);
+  --muted-foreground: oklch(0.46 0 0);
+  --accent: oklch(0.606 0.246 17.5);
+  --accent-foreground: oklch(0.994 0 0);
+  --brand-red: oklch(0.606 0.246 17.5);
+  --surface: oklch(0.972 0.0025 106);
+  --destructive: oklch(0.606 0.246 17.5);
+  --destructive-foreground: oklch(0.994 0 0);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.88 0 0);
+  --ring: oklch(0.606 0.246 17.5);
+  --chart-1: oklch(0 0 0);
+  --chart-2: oklch(0.606 0.246 17.5);
+  --chart-3: oklch(0.46 0 0);
+  --chart-4: oklch(0.75 0 0);
+  --chart-5: oklch(0.9 0 0);
+  --sidebar: oklch(0.994 0 0);
+  --sidebar-foreground: oklch(0 0 0);
+  --sidebar-primary: oklch(0 0 0);
+  --sidebar-primary-foreground: oklch(0.994 0 0);
+  --sidebar-accent: oklch(0.962 0 0);
+  --sidebar-accent-foreground: oklch(0 0 0);
+  --sidebar-border: oklch(0.9 0 0);
+  --sidebar-ring: oklch(0.606 0.246 17.5);
+}
+
+@theme inline {
+  --color-brand-red: var(--brand-red);
+  --color-surface: var(--surface);
+  --color-seasonal-gold: #C9A24A;
+  --color-seasonal-accent: oklch(0.47 0.085 86);
+}
+
+/* Announcement bar: text scrolls right to left, endlessly, and pauses while the pointer is over it. */
+@keyframes shop-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.shop-marquee-track {
+  animation: shop-marquee var(--marquee-duration, 40s) linear infinite;
+  will-change: transform;
+}
+.shop-marquee:hover .shop-marquee-track,
+.shop-marquee:focus-within .shop-marquee-track {
+  animation-play-state: paused;
+}
+
+.seasonal-tag {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.dark {
+  --surface: oklch(0.16 0 0);
+  --background: oklch(0 0 0);
+  --foreground: oklch(0.994 0 0);
+  --card: oklch(0 0 0);
+  --card-foreground: oklch(0.994 0 0);
+  --popover: oklch(0 0 0);
+  --popover-foreground: oklch(0.994 0 0);
+  --primary: oklch(0.994 0 0);
+  --primary-foreground: oklch(0 0 0);
+  --secondary: oklch(0.18 0 0);
+  --secondary-foreground: oklch(0.994 0 0);
+  --muted: oklch(0.18 0 0);
+  --muted-foreground: oklch(0.72 0 0);
+  --accent: oklch(0.606 0.246 17.5);
+  --accent-foreground: oklch(0.994 0 0);
+  --destructive: oklch(0.606 0.246 17.5);
+  --destructive-foreground: oklch(0.994 0 0);
+  --border: oklch(1 0 0 / 14%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: oklch(0.606 0.246 17.5);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  p,
+  li,
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  label,
+  dt,
+  dd,
+  th,
+  td {
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  h1 {
+    line-height: 1.08;
+  }
+
+  h2 {
+    line-height: 1.14;
+  }
+
+  h3,
+  h4 {
+    line-height: 1.25;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button,
+  [role="button"] {
+    font-weight: 600;
+  }
+
+  label,
+  nav,
+  small,
+  footer {
+    font-family: var(--font-sans);
+  }
+
+  nav,
+  label {
+    font-weight: 500;
+  }
+
+  input,
+  select,
+  textarea {
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  ::selection {
+    background-color: var(--brand-red);
+    color: var(--color-background);
+  }
+}
+
+/* Full-bleed off-white band without breaking the max-width container. */
+.section-surface {
+  background-color: var(--surface);
+  box-shadow: 0 0 0 100vmax var(--surface);
+  clip-path: inset(0 -100vmax);
+}
+
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+@utility product-card-title {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+@utility product-card-price {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+@utility product-card-meta {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+@media screen and (max-width: 639px) {
+  body {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 0.9375rem;
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    line-height: 1.45;
+  }
+
+  .product-card-title {
+    font-size: 0.9375rem;
+  }
+
+  .product-card-price {
+    font-size: 0.875rem;
+  }
+
+  .product-card-meta {
+    font-size: 0.75rem;
+  }
+}
+
+@keyframes shop-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Free-shipping meter (mini cart and cart page) */
+@keyframes ship-shine {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+@keyframes ship-drive {
+  0%, 100% { transform: translateX(-1px); }
+  50% { transform: translateX(1.5px); }
+}
+@keyframes ship-pop {
+  0% { transform: scale(0.4) rotate(-20deg); }
+  60% { transform: scale(1.25) rotate(8deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes ship-text {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ship-confetti {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--cx), var(--cy)) rotate(260deg) scale(0.6); }
+}
+.ship-shine {
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent);
+  animation: ship-shine 1.8s ease-in-out infinite;
+}
+.ship-drive { animation: ship-drive 0.9s ease-in-out infinite; }
+.ship-pop { animation: ship-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.ship-text { animation: ship-text 0.4s ease-out both; }
+.ship-confetti { animation: ship-confetti 1.1s ease-out forwards; }
+.ship-fill { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .ship-shine, .ship-drive, .ship-pop, .ship-text, .ship-confetti { animation: none; }
+}
+
+@keyframes shop-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes mobile-menu-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(5%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mobile-menu-leave {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(4%, 0, 0);
+  }
+}
+
+@keyframes mobile-menu-item-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.mobile-menu {
+  animation: mobile-menu-enter 380ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.mobile-menu.is-closing {
+  animation: mobile-menu-leave 320ms cubic-bezier(0.4, 0, 1, 1) both;
+  pointer-events: none;
+}
+
+.mobile-menu-item,
+.mobile-menu-social {
+  animation: mobile-menu-item-enter 340ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.mobile-menu-item:nth-child(1) {
+  animation-delay: 45ms;
+}
+.mobile-menu-item:nth-child(2) {
+  animation-delay: 75ms;
+}
+.mobile-menu-item:nth-child(3) {
+  animation-delay: 105ms;
+}
+.mobile-menu-item:nth-child(4) {
+  animation-delay: 135ms;
+}
+.mobile-menu-item:nth-child(5) {
+  animation-delay: 165ms;
+}
+.mobile-menu-item:nth-child(6) {
+  animation-delay: 195ms;
+}
+.mobile-menu-social {
+  animation-delay: 225ms;
+}
+
+@utility reveal-hidden {
+  opacity: 0;
+}
+
+.shop-reveal {
+  animation: shop-rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.shop-fade {
+  animation: shop-fade 0.9s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .shop-reveal,
+  .shop-fade {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+.product-cat-main a {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* underline-style links ("All collections", "View all") must stay square or the line bends */
+.product-cat-main a.eyebrow[class*="border-b"]:not(.border) {
+  border-radius: 0;
+}
+
+.product-main {
+  border-radius: 12px;
+}
+
+.footer-logo {
+  width: 70%;
+}
+
+@media screen and (max-width: 480px) {
+  .footer-logo {
+    margin: auto;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Admin panel look (Shopify-style). Scoped to .admin-ui so the storefront keeps
+   the store brand styling (Cinzel headings, square corners, red accent).
+   --------------------------------------------------------------------------- */
+.admin-ui {
+  --radius: 0.5rem;
+  font-family: var(--font-sans);
+}
+.admin-ui .font-display {
+  font-family: var(--font-sans);
+  text-transform: none;
+  letter-spacing: -0.01em;
+}
+.admin-ui .eyebrow {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+.admin-ui button.eyebrow,
+.admin-ui a.eyebrow,
+.admin-ui input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.admin-ui select,
+.admin-ui textarea {
+  border-radius: 8px;
+}
+.admin-ui .border.border-border {
+  border-radius: 10px;
+}
+.admin-ui .hover\:bg-brand-red:hover {
+  background-color: #1a1a1a;
+}
+.admin-ui .hover\:border-brand-red:hover,
+.admin-ui .focus\:border-brand-red:focus {
+  border-color: #005bd3;
+}
+.admin-ui .hover\:text-brand-red:hover {
+  color: #005bd3;
+}
+.admin-ui h1,
+.admin-ui h2,
+.admin-ui h3,
+.admin-ui h4 {
+  font-family: var(--font-sans);
+  font-variant: normal;
+  text-transform: none;
+  letter-spacing: -0.005em;
+}
+
+/* ===========================================================================
+   Admin density pass: compact, quiet, Shopify-like controls for EVERY admin
+   screen (scoped to .admin-ui, so the storefront is untouched).
+   =========================================================================== */
+.admin-ui {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #303030;
+}
+.admin-ui .text-sm { font-size: 13px; line-height: 1.45; }
+.admin-ui .text-xs { font-size: 12px; line-height: 1.4; }
+.admin-ui .text-base { font-size: 14px; }
+.admin-ui .text-lg { font-size: 15px; line-height: 1.4; }
+.admin-ui .text-xl { font-size: 16px; }
+.admin-ui .text-2xl { font-size: 20px; }
+.admin-ui .uppercase { text-transform: none; }
+.admin-ui .tracking-wider,
+.admin-ui .tracking-tight { letter-spacing: 0; }
+
+/* Brand "eyebrow" buttons and links -> compact admin buttons */
+.admin-ui button.eyebrow,
+.admin-ui a.eyebrow {
+  padding: 6px 12px;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 600;
+  border-radius: 8px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.admin-ui button.eyebrow.bg-foreground,
+.admin-ui a.eyebrow.bg-foreground {
+  background-color: #303030;
+  color: #fff;
+  border: 1px solid #303030;
+}
+.admin-ui button.eyebrow.border:not(.bg-foreground):not(.bg-brand-red),
+.admin-ui a.eyebrow.border:not(.bg-foreground):not(.bg-brand-red),
+.admin-ui main button.border.border-border:not(.bg-foreground):not(.bg-brand-red),
+.admin-ui main a.border.border-border:not(.bg-foreground):not(.bg-brand-red) {
+  background-color: #fff;
+  border-color: #c9c9c9;
+  border-radius: 8px;
+}
+.admin-ui main button.border.border-border:hover,
+.admin-ui main a.border.border-border:hover,
+.admin-ui button.eyebrow.border:hover,
+.admin-ui a.eyebrow.border:hover {
+  background-color: #f7f7f7;
+  border-color: #8a8a8a;
+}
+.admin-ui main button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Small bordered text buttons in table rows */
+.admin-ui main td button.px-2,
+.admin-ui main td a.px-2 {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+/* Form controls */
+.admin-ui main input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+.admin-ui main select,
+.admin-ui main textarea {
+  font-size: 13px;
+  padding: 6px 10px;
+  min-height: 32px;
+  background-color: #fff;
+  border: 1px solid #8a8a8a;
+  border-radius: 8px;
+}
+.admin-ui main textarea { min-height: 72px; }
+.admin-ui main input:focus,
+.admin-ui main select:focus,
+.admin-ui main textarea:focus {
+  outline: none;
+  border-color: #005bd3;
+  box-shadow: 0 0 0 2px rgba(0, 91, 211, 0.25);
+}
+.admin-ui main input::placeholder,
+.admin-ui main textarea::placeholder { color: #8a8a8a; }
+.admin-ui main label.block,
+.admin-ui main label.eyebrow { font-weight: 500; }
+
+/* Cards: any bordered white panel */
+.admin-ui main .border.border-border.bg-background,
+.admin-ui main .border.border-border.bg-surface {
+  border-color: #e3e3e3;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 1px 0 rgba(26, 26, 26, 0.07);
+}
+.admin-ui main [role="dialog"] > div,
+.admin-ui main [role="dialog"] > form {
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+.admin-ui main [role="dialog"] .bg-brand-red { background-color: #b42318; }
+
+/* Tables */
+.admin-ui main table { font-size: 13px; }
+.admin-ui main thead { border-color: #e3e3e3; }
+.admin-ui main th {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #616161;
+  background: #f7f7f7;
+  white-space: nowrap;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.admin-ui main td { padding: 8px 12px; vertical-align: middle; }
+.admin-ui main tbody tr { border-color: #ebebeb; }
+.admin-ui main tbody tr:hover { background: #fafafa; }
+
+/* Active filter chips / selected pills: dark, not red */
+.admin-ui main .bg-brand-red { background-color: #303030; }
+.admin-ui main .border-brand-red { border-color: #303030; }
+
+/* Headings inside pages */
+.admin-ui main h2.font-display,
+.admin-ui main h3.font-display { font-size: 15px; font-weight: 600; }
+.admin-ui main p.eyebrow,
+.admin-ui main legend.eyebrow { font-size: 13px; font-weight: 600; color: #303030; }
+.admin-ui main fieldset { border-radius: 12px; }
+
+/* Small solid tags (e.g. "Active" on banner cards) -> soft status badges */
+.admin-ui main span.bg-foreground.text-background {
+  background-color: #cdfee1;
+  color: #0c5132;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.admin-ui main span.bg-brand-red.text-background {
+  background-color: #fed3d1;
+  color: #8e1f0b;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.admin-ui main a { text-underline-offset: 3px; }
+
+
+/* ===========================================================================
+   Storefront rounding (12px, same as the product card) and the menu font.
+   All selectors use :where() so they have zero specificity: any explicit
+   rounded-* class, and the admin panel's own rules, still win over them.
+   =========================================================================== */
+:root {
+  --radius: 0.75rem;                       /* rounded-lg = 12px, rounded-sm = 8px */
+  --radius-card: 12px;
+  --font-menu: "Montserrat", "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+@utility font-menu {
+  font-family: var(--font-menu);
+}
+
+:where(button.eyebrow, a.eyebrow, select, textarea,
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"])) {
+  border-radius: var(--radius-card);
+}
+/* bordered boxes / cards */
+:where(.border.border-border) {
+  border-radius: var(--radius-card);
+}
+/* content images (banners, tiles, gallery thumbnails...) but not full-bleed backgrounds */
+:where(main img, aside img, [role="dialog"] img) {
+  border-radius: var(--radius-card);
+}
+:where(img.absolute, .absolute > img, .absolute > picture > img, picture.absolute > img, .rounded-none img, img.rounded-none) {
+  border-radius: 0;
+}
+/* small tags on top of images */
+:where(.eyebrow.absolute) {
+  border-radius: 0 0 var(--radius-card) 0;
+}
+
+/* Any bordered link or button (tabs, chips, filters...) gets the same 12px corners. */
+:where(a.border, button.border) {
+  border-radius: var(--radius-card);
+}
+
+/* Underline-style links ("All collections", "View all"...) have only a bottom border: curved
+   corners would bend the line, so they stay square. */
+:where(a.eyebrow[class*="border-b"]:not(.border), button.eyebrow[class*="border-b"]:not(.border)) {
+  border-radius: 0;
+}
+
+/* reCAPTCHA v3 badge: hidden; the required notice is printed in the footer instead. */
+.grecaptcha-badge { visibility: hidden !important; }
+
+/* Loading skeletons: a soft highlight sweeps across every placeholder. */
+@keyframes skel-sweep {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
+}
+.skel {
+  background-image: linear-gradient(105deg, transparent 25%, rgb(255 255 255 / 0.55) 50%, transparent 75%);
+  background-size: 250% 100%;
+  background-repeat: no-repeat;
+  background-position: 150% 0;
+  animation: skel-sweep 1.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skel { animation: none; }
+}
+
+/* Storefront loading: the real page frame stays, and only the data areas breathe softly (no grey blocks). */
+@keyframes soft-breathe {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.8; }
+}
+.soft-load {
+  background-color: color-mix(in srgb, var(--muted) 45%, transparent);
+  animation: soft-breathe 1.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .soft-load { animation: none; }
+}
+
+/* Barcode labels (Admin -> Inventory -> Barcode labels): on screen a small preview, when printing only the labels. */
+.label-sheet { display: flex; flex-wrap: wrap; gap: 2mm; margin-top: 12px; }
+.label-item { box-sizing: border-box; overflow: hidden; border: 1px dashed #c9c9c9; border-radius: 2px; padding: 1.2mm 1.5mm; background: #fff; color: #000; display: flex; flex-direction: column; justify-content: space-between; break-inside: avoid; }
+.label-name { font-size: 7pt; line-height: 1.15; font-weight: 600; max-height: 2.3em; overflow: hidden; }
+.label-foot { display: flex; justify-content: space-between; gap: 2mm; font-size: 6.5pt; line-height: 1; font-family: ui-monospace, monospace; }
+@media print {
+  body * { visibility: hidden !important; }
+  .label-sheet, .label-sheet * { visibility: visible !important; }
+  .label-sheet { position: absolute; left: 0; top: 0; margin: 0; gap: 0; }
+  .label-item { border: 0; border-radius: 0; page-break-inside: avoid; }
+  @page { margin: 0; }
+}

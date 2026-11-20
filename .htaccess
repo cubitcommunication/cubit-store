@@ -1,0 +1,12 @@
+# Hostinger's Git copies the whole repository into the website folder. The finished website is the site/ folder
+# (built by GitHub Actions), so every request is handed to it. Nothing else in the repository (source code, docs,
+# workflow files, .git) can ever be reached from a browser.
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Let's Encrypt / SSL checks look in /.well-known of the website folder itself.
+    RewriteCond %{REQUEST_URI} !^/\.well-known/
+    RewriteCond %{REQUEST_URI} !^/site/
+    RewriteRule ^(.*)$ site/$1 [L]
+</IfModule>
