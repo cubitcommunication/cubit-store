@@ -1,10 +1,10 @@
 # Store template — notes for AI coding agents
 
 Stack: React (Vite SPA, `frontend/`) + Laravel 12 / PHP 8.2 API (`backend/`) + MySQL. Hosted on Hostinger
-shared hosting. GitHub Actions (`.github/workflows/deploy.yml`) builds the site into the `site/` folder of `main` (a bot commit marked `[skip ci]`; never edit `site/` by hand); Hostinger's Git pulls `main` and the root `.htaccess` serves `site/` (no SSH, no secrets, no second branch), and `App\Support\Updater` runs migrations on the first request after a pull. See `README.md` and `DEPLOYMENT.md`.
+shared hosting. GitHub Actions (`.github/workflows/deploy.yml`) builds the site into the `site/` folder of the branch it ran on, `main` or `stable` (a bot commit marked `[skip ci]`; never edit `site/` by hand); client sites' Hostinger Git pulls `stable`, while `main` is where work lands and the root `.htaccess` serves `site/` (no SSH, no secrets, no second branch), and `App\Support\Updater` runs migrations on the first request after a pull. See `README.md` and `DEPLOYMENT.md`.
 
 - Do not rewrite published git history (no force-push, rebase or amend of pushed commits).
-- Keep `main` deployable: every push to `main` is built into `site/` on `main`, which is what production pulls. Run `git pull --rebase` before pushing, because the workflow adds a "Build site" commit after each push.
+- Keep `main` deployable: every push to `main` is built into `site/` on `main`, and merging `main` into `stable` is what reaches client sites. Run `git pull --rebase` before pushing, because the workflow adds a "Build site" commit after each push.
 - The site ships as an enquiry-only catalogue (WhatsApp) and every selling feature is OFF by default. Cart, checkout,
   wishlist and customer accounts are switched on in Admin -> Store features (`site_settings`, group `commerce`) and are
   enforced on the server (`App\Support\Commerce`), not just hidden in the UI. Keep that: new selling features need a

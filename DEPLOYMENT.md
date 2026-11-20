@@ -4,12 +4,22 @@ Architecture: **React (static files) + Laravel/PHP API + MySQL**, deployed from 
 every site made from this project.
 
 Hostinger shared hosting cannot run `npm` or `composer`, so **GitHub Actions builds the website** and saves it in the
-**`site/` folder of the same `main` branch** (one extra commit made by the workflow, marked `[skip ci]`).
-**Hostinger's own Git feature pulls `main`.** That is the whole deploy, with no second branch:
+**`site/` folder of the branch it ran on** (one extra commit made by the workflow, marked `[skip ci]`).
+
+## Two branches: `main` for work, `stable` for client sites
+
+The workflow builds **`main`** and **`stable`**. Client sites pull **`stable`**, never `main`, so a broken commit
+cannot reach every site at once:
 
 ```
-you push to main -> GitHub Actions tests + builds -> site/ is saved on main -> Hostinger pulls main -> the first visit finishes the update
+push to main -> Actions builds site/ on main -> check it on your own test site
+merge main into stable -> Actions builds site/ on stable -> client sites pull stable -> the first visit finishes the update
 ```
+
+One repository serves every client site. Each site keeps its own database, its own `site/backend/.env` and its own
+`media/`, none of which are in Git, so a pull never touches a client's data, logo, products or settings. Never fork
+the repository for one client: a fork stops receiving updates. Per-client differences belong in that site's `.env`
+and in Admin -> Store features.
 
 No SSH keys, no GitHub secrets and no commands on the server. After a pull, the first request runs any new database
 migrations and refreshes the caches by itself (`App\Support\Updater`).
@@ -45,7 +55,7 @@ not, so they survive every update.
 3. **Hostinger: the database.** hPanel → Databases → MySQL Databases → create a database, a user and a password.
    Write the three down (Hostinger adds a prefix such as `u123456789_`).
 4. **Hostinger: connect Git.** hPanel → Advanced → **Git** → create a repository: your GitHub repository URL, branch
-   **`main`**, install path empty (= the site's `public_html`). For a private repository hPanel shows a **deploy key**:
+   **`stable`**, install path empty (= the site's `public_html`). For a private repository hPanel shows a **deploy key**:
    add it in GitHub → repo → Settings → Deploy keys. Press **Deploy**.
    If hPanel says the folder is not empty, open File Manager and delete `default.php` (the placeholder page) first.
 5. **Automatic deploys.** hPanel's Git page shows a **webhook URL**. Add it in GitHub → repo → Settings → Webhooks
