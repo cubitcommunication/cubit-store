@@ -48,7 +48,6 @@ Route::middleware('storefront-api')->prefix('public')->group(function () {
     Route::get('/products', [\App\Http\Controllers\StorefrontApiController::class, 'products'])->middleware('throttle:query');
     Route::get('/coupon', [\App\Http\Controllers\StorefrontApiController::class, 'coupon'])->middleware('throttle:query');
     Route::post('/order', [\App\Http\Controllers\StorefrontApiController::class, 'order'])->middleware('throttle:checkout');
-    Route::options('/{any}', fn () => response('', 204))->where('any', 'products|coupon|order');
 });
 
 // Called by Razorpay's servers, not by browsers: no cookies or same-origin rule. The signature is the proof.

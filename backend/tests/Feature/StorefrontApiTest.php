@@ -37,7 +37,12 @@ class StorefrontApiTest extends TestCase
 
     private function enable(): void
     {
-        config(['shop.features.external_storefront' => true, 'shop.storefront_api.origins' => self::ORIGIN]);
+        config([
+            'shop.features.external_storefront' => true,
+            'shop.storefront_api.origins' => self::ORIGIN,
+            // In a running site both come from STOREFRONT_API_ORIGINS; here they are set by hand.
+            'cors.allowed_origins' => [self::ORIGIN],
+        ]);
     }
 
     /** @return array<string, string> */
