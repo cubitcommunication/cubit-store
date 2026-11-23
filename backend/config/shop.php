@@ -1,5 +1,15 @@
 <?php
 
+/** Reads a comma-separated .env line into a list of trimmed names, or keeps the defaults when it is not set. */
+$list = function (string $key, array $default): array {
+    $raw = trim((string) env($key, ''));
+    if ($raw === '') {
+        return $default;
+    }
+
+    return array_values(array_filter(array_map('trim', explode(',', $raw))));
+};
+
 return [
     // Public address of the site (used in the sitemap, canonical URLs and OG tags).
     'site_url' => rtrim((string) env('SITE_URL', 'https://example.com'), '/'),
@@ -44,8 +54,15 @@ return [
     'max_image_bytes' => 8 * 1024 * 1024,
     'max_video_bytes' => 40 * 1024 * 1024,
 
-    // Business vocabulary used by the CSV importer (mirrors frontend/src/config/brand.ts: keep both lists the same).
-    'categories' => [],
-    'materials' => ['Cotton', 'Leather', 'Metal', 'Wood', 'Glass'],
-    'occasions' => ['Everyday', 'Bridal', 'Reception', 'Party'],
+    /*
+     | Business vocabulary used by the CSV importer (mirrors frontend/src/config/brand.ts: keep both lists the same).
+     |
+     | Every store sells something different, so each list can be set per site in backend/.env as a comma-separated
+     | line — SHOP_MATERIALS="Bagasse, Wood", SHOP_OCCASIONS="Everyday, Wedding" — without touching this file.
+     | Categories normally come from Admin -> Categories; SHOP_CATEGORIES only adds names the importer should also
+     | accept. An empty .env line keeps the defaults below.
+     */
+    'categories' => $list('SHOP_CATEGORIES', []),
+    'materials' => $list('SHOP_MATERIALS', ['Cotton', 'Leather', 'Metal', 'Wood', 'Glass']),
+    'occasions' => $list('SHOP_OCCASIONS', ['Everyday', 'Bridal', 'Reception', 'Party']),
 ];
