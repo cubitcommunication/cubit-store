@@ -1,0 +1,44 @@
+name: Tests
+
+# Checks a branch before it reaches main or stable. It only tests: nothing is built into site/ and nothing is
+# committed or deployed, so it is safe to run on any work in progress. main and stable are covered by deploy.yml.
+on:
+  pull_request:
+  push:
+    branches-ignore: [main, stable]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Test the React app
+        working-directory: frontend
+        run: |
+          npm install --no-audit --no-fund
+          npm test
+          npm run typecheck
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, pdo_mysql, pdo_sqlite, fileinfo, gd, openssl
+          tools: composer:v2
+
+      - name: Test the API
+        working-directory: backend
+        run: |
+          composer install --no-interaction --prefer-dist
+          cp .env.example .env
+          php artisan key:generate
+          php artisan test

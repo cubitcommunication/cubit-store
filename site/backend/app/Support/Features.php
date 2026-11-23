@@ -12,6 +12,9 @@ final class Features
     /** Offline shop: Quick sell by barcode, barcode and piece labels, shop customers, and the online/shop split in reports. */
     public const OFFLINE_SHOP = 'offline_shop';
 
+    /** External storefront API: a client's own website reads this catalogue and posts its orders here (/api/public/*). */
+    public const EXTERNAL_STOREFRONT = 'external_storefront';
+
     public static function on(string $feature): bool
     {
         return (bool) config('shop.features.'.$feature, false);
@@ -20,6 +23,6 @@ final class Features
     /** @return array<string, bool> every add-on and whether it is on (what the admin panel is told). */
     public static function all(): array
     {
-        return [self::OFFLINE_SHOP => self::on(self::OFFLINE_SHOP)];
+        return [self::OFFLINE_SHOP => self::on(self::OFFLINE_SHOP), self::EXTERNAL_STOREFRONT => self::on(self::EXTERNAL_STOREFRONT)];
     }
 }

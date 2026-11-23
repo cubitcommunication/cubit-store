@@ -30,6 +30,8 @@ export const CSV_COLUMNS = [
   "Additional Image URLs",
   "Image Alt Text",
   "WhatsApp Enquiry Message",
+  "Option Name",
+  "Variants",
 ] as const;
 
 export type CsvColumn = (typeof CSV_COLUMNS)[number];
