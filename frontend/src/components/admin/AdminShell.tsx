@@ -157,7 +157,7 @@ export function AdminShell({ title, actions, children, back }: { title: string; 
         <JumpSearch onSettings={openSettings} isSuper={isSuper} />
         <div className="ml-auto flex items-center gap-1">
           <NotificationBell />
-          <a href="/" target="_blank" rel="noreferrer" className="hidden items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] hover:bg-white/10 sm:flex">
+          <a href={brand.storefrontUrl || "/"} target="_blank" rel="noreferrer" className="hidden items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] hover:bg-white/10 sm:flex">
             <ExternalLink className="size-4" /> View store
           </a>
           <details className="relative">

@@ -73,6 +73,7 @@ final class Brand
             'timezone' => self::timezone(),
             'country' => self::get('country'),
             'siteUrl' => self::siteUrl(),
+            'storefrontUrl' => self::get('storefront_url'),
         ];
     }
 
