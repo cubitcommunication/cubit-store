@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\AbandonedCarts;
 use App\Support\Coupons;
 use App\Support\OrderService;
 use Illuminate\Http\JsonResponse;
@@ -61,6 +62,24 @@ final class StorefrontApiController
         ]);
     }
 
+    /**
+     * The small script a client's own website loads to keep its printed prices in step with this admin.
+     * It is served from here, not copied into the site, so every store gets fixes without touching the site.
+     */
+    public function script(): \Symfony\Component\HttpFoundation\Response
+    {
+        $file = base_path('resources/storefront/sync.js');
+        if (! is_file($file)) {
+            return response("/* storefront sync script missing */\n", 404, ['Content-Type' => 'application/javascript']);
+        }
+
+        return response((string) file_get_contents($file), 200, [
+            'Content-Type' => 'application/javascript; charset=utf-8',
+            // Short, so a fix reaches the shops quickly, but long enough not to be fetched on every page.
+            'Cache-Control' => 'public, max-age=300',
+        ]);
+    }
+
     /** Checks a discount code against a subtotal, so the site can show the saving before the order is placed. */
     public function coupon(Request $request): JsonResponse
     {
@@ -94,6 +113,30 @@ final class StorefrontApiController
             'discount' => $result['discount'],
             'free_shipping' => $result['freeShipping'],
         ]);
+    }
+
+    /**
+     * Remembers a cart the shopper has not paid for yet, so Admin -> Abandoned carts can show it and alert the
+     * store. Call it when the shopper has shown intent (reached checkout, typed their phone), not on every click.
+     */
+    public function cart(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'name' => ['nullable', 'string', 'max:120'],
+            'phone' => ['required', 'string', 'max:40'],
+            'email' => ['nullable', 'email', 'max:191'],
+            'items' => ['required', 'array'],
+        ]);
+
+        AbandonedCarts::capture(
+            $this->resolve($data['items'])['items'],
+            $this->emailFor($data['phone'], $data['email'] ?? null),
+            $data['name'] ?? null,
+            $data['phone'],
+            null,
+        );
+
+        return response()->json(['ok' => true]);
     }
 
     /** Places an order from the external site. Returns the order number the customer should quote. */

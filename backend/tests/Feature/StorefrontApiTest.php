@@ -106,6 +106,24 @@ class StorefrontApiTest extends TestCase
             ->assertJsonPath('discount', 80);
     }
 
+    public function test_a_stand_in_address_is_never_e_mailed(): void
+    {
+        config(['shop.storefront_api.phone_email_domain' => 'phone.invalid']);
+
+        $this->assertTrue(\App\Support\AbandonedCarts::isStandInEmail('9876543210@phone.invalid'));
+        $this->assertFalse(\App\Support\AbandonedCarts::isStandInEmail('asha@example.com'));
+    }
+
+    public function test_the_cart_endpoint_accepts_a_cart_from_the_shop(): void
+    {
+        $this->enable();
+
+        $this->postJson('/api/public/cart', [
+            'name' => 'Asha', 'phone' => '9876543210',
+            'items' => [['id' => 'p9-round', 'q' => 25, 'n' => 1]],
+        ], $this->headers())->assertOk()->assertJsonPath('ok', true);
+    }
+
     public function test_an_unknown_product_does_not_become_an_order(): void
     {
         $this->enable();
