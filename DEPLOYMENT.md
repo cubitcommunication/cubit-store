@@ -216,3 +216,41 @@ customers already saved are kept; nothing is deleted.
 | Upload fails for big pictures or videos | Raise `upload_max_filesize` / `post_max_size` in hPanel → PHP Configuration (64M or more for reels). |
 | Uploads vanished after a deploy | They are in `public_html/site/media/`; a Git pull never touches it. Check the folder was not deleted by hand. |
 | E-mail stopped working after a domain switch | The nameservers were changed without copying the MX records. Restore the MX records at the DNS provider. |
+
+## Connecting a client's existing website (external storefront API)
+
+A client may already have a website whose design they want to keep. It can keep its pages and still use this store as
+its backend: the catalogue, discount codes and orders come from here, so stock, coupons, customers and the order list
+all live in the admin panel.
+
+Switch it on in that site's `backend/.env`:
+
+```
+FEATURE_EXTERNAL_STOREFRONT=true
+STOREFRONT_API_ORIGINS=https://example.com,https://www.example.com
+```
+
+List every origin the browser may send, with scheme and without a trailing slash (`https://example.com` and
+`https://www.example.com` are two different origins). A request from any other website is refused, and the CORS
+headers are sent only to the ones listed.
+
+The client's site then talks to three endpoints:
+
+| Endpoint | What it does |
+| --- | --- |
+| `GET /api/public/products` | the catalogue: price, MRP, stock, images and the pack variants |
+| `GET /api/public/coupon?code=&subtotal=` | checks a discount code before the order is placed |
+| `POST /api/public/order` | places the order and returns its number |
+
+An order posts `{name, phone, address, city, state, pin, gstin, note, coupon, items}`, where each item is
+`{id, q, n}`: the product's **slug**, the **pack size** (matched against the variant's title or SKU, so name a pack
+variant "Pack of 25") and **how many packs**. Prices, discounts, shipping and stock are worked out on the server from
+the database; whatever the browser says about money is ignored.
+
+Orders arrive as ordinary unpaid orders, so a site that takes its orders over WhatsApp keeps doing exactly that — the
+order is simply recorded here as well, with its own number. If the site has no e-mail field, the customer's phone
+number becomes their stand-in address (`STOREFRONT_API_PHONE_EMAIL_DOMAIN`), which keeps their order history and
+coupon limits together; collecting a real e-mail on the form is better.
+
+An `Origin` header is only trustworthy from a browser, so the allow-list stops other websites, not a determined
+script. Order intake is rate limited, and every order still has to be confirmed by staff.

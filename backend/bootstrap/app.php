@@ -32,6 +32,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'same-origin' => SameOriginWrites::class,
             'feature' => \App\Http\Middleware\RequireFeature::class,
             'storefront' => \App\Http\Middleware\StorefrontPassword::class,
+            'storefront-api' => \App\Http\Middleware\StorefrontApi::class,
             'recaptcha' => \App\Http\Middleware\VerifyRecaptcha::class,
         ]);
     })

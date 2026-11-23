@@ -39,6 +39,17 @@ use Illuminate\Support\Facades\Route;
 // Public image files (Apache serves them directly when present; this is the PHP fallback).
 Route::get('/public/img/{path}', PublicImageController::class)->where('path', '.*');
 
+/*
+| The external storefront API. A client's own website lives on another domain, so these cannot sit behind
+| `same-origin`; App\Http\Middleware\StorefrontApi is what guards them instead (add-on off by default, an
+| allow-list of origins, and the CORS headers only for those origins). See StorefrontApiController.
+*/
+Route::middleware('storefront-api')->prefix('public')->group(function () {
+    Route::get('/products', [\App\Http\Controllers\StorefrontApiController::class, 'products'])->middleware('throttle:query');
+    Route::get('/coupon', [\App\Http\Controllers\StorefrontApiController::class, 'coupon'])->middleware('throttle:query');
+    Route::post('/order', [\App\Http\Controllers\StorefrontApiController::class, 'order'])->middleware('throttle:checkout');
+});
+
 // Called by Razorpay's servers, not by browsers: no cookies or same-origin rule. The signature is the proof.
 Route::post('/webhooks/razorpay', \App\Http\Controllers\RazorpayWebhookController::class)->middleware('throttle:webhook');
 Route::post('/webhooks/shiprocket', \App\Http\Controllers\ShiprocketWebhookController::class)->middleware('throttle:webhook');
