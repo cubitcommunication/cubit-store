@@ -7,12 +7,14 @@
  * website on the internet read this store's API from a visitor's browser. This app does not need that: its own
  * React storefront and admin are served from the same origin, and every other route is behind `same-origin`.
  *
- * The one exception is the external storefront API, which exists to be called by a client's own website. Those
- * three routes are listed here, and the origins allowed to call them are the same STOREFRONT_API_ORIGINS list the
- * gate middleware checks, so there is one place to add a website.
+ * The one exception is the external storefront API, which exists to be called by a client's own website. Its
+ * routes are listed here, and the origins allowed to call them are the same STOREFRONT_API_ORIGINS list the gate
+ * middleware checks, so there is one place to add a website.
  */
 return [
-    'paths' => ['api/public/products', 'api/public/coupon', 'api/public/order'],
+    // Every external storefront route. The headers still only go out for an allowed origin, and a route that
+    // is not part of that API (the image route) simply never needs them.
+    'paths' => ['api/public/*'],
 
     'allowed_methods' => ['GET', 'POST', 'OPTIONS'],
 
