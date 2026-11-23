@@ -34,6 +34,11 @@ final class BulkService
         }
         $collectionNames = DB::table('collections')->pluck('name')->all();
 
+        $variantsByProduct = [];
+        foreach (DB::table('product_variants')->orderBy('product_id')->orderBy('sort_order')->get() as $variant) {
+            $variantsByProduct[$variant->product_id][] = $variant;
+        }
+
         $records = [];
         foreach ($products as $product) {
             $own = $byProduct[$product->id] ?? [];
@@ -62,6 +67,16 @@ final class BulkService
                 'Additional Image URLs' => implode(',', array_map(fn ($i) => $i->image_url, array_slice($own, 1))),
                 'Image Alt Text' => $own[0]->alt_text ?? '',
                 'WhatsApp Enquiry Message' => $specs['whatsapp_message'] ?? '',
+                'Option Name' => $this->decodeJson($product->options ?? null, [])[0]['name'] ?? '',
+                'Variants' => implode('; ', array_map(
+                    fn ($v) => implode(' | ', [
+                        $v->title,
+                        $v->price !== null ? (string) (float) $v->price : '',
+                        $v->compare_at_price !== null ? (string) (float) $v->compare_at_price : '',
+                        $v->stock_quantity !== null ? (string) (int) $v->stock_quantity : '',
+                    ]),
+                    $variantsByProduct[$product->id] ?? []
+                )),
             ];
         }
 
@@ -295,6 +310,11 @@ final class BulkService
 
             $payload = null;
             if (! $errors && ! $skip) {
+                ['variants' => $variants, 'errors' => $variantErrors] = Csv::parseVariants(trim($record['Variants'] ?? ''));
+                foreach ($variantErrors as $variantError) {
+                    $errors[] = $variantError;
+                }
+
                 $payload = [
                     'name' => $name, 'slug' => $slug, 'sku' => $sku, 'price' => $price,
                     'category' => $category, 'material' => $material,
@@ -314,6 +334,8 @@ final class BulkService
                     'primaryImage' => $primaryImage,
                     'additionalImages' => $additionalImages,
                     'altText' => trim($record['Image Alt Text'] ?? '') ?: "{$name} - ".\App\Support\Brand::name(),
+                    'optionName' => trim($record['Option Name'] ?? '') ?: 'Variant',
+                    'variants' => $variants,
                 ];
             }
 
@@ -456,6 +478,58 @@ final class BulkService
 
     /* ------------------------------------------------------------------ import */
 
+    /**
+     * Writes a product's variants from the CSV.
+     *
+     * Matching is by the variant's own name, so re-importing the same file updates prices and stock instead of
+     * making duplicates. A variant the file does not mention is left alone: orders already point at it, and a
+     * silent delete would take its stock history with it. Remove those in the product editor.
+     */
+    private function saveVariants(string $productId, string $optionName, array $variants, float $productPrice, string $now): void
+    {
+        $existing = DB::table('product_variants')->where('product_id', $productId)->get();
+        $byValue = [];
+        foreach ($existing as $row) {
+            $byValue[mb_strtolower(trim($row->title))] = $row;
+        }
+        $order = (int) ($existing->max('sort_order') ?? -1);
+
+        foreach ($variants as $variant) {
+            $price = $variant['price'] ?? ($productPrice > 0 ? $productPrice : null);
+            $fields = [
+                'title' => $variant['value'],
+                'options' => json_encode([$optionName => $variant['value']], JSON_UNESCAPED_UNICODE),
+                'price' => $price,
+                'compare_at_price' => $variant['mrp'],
+                'stock_quantity' => $variant['stock'],
+                'updated_at' => $now,
+            ];
+
+            $match = $byValue[mb_strtolower($variant['value'])] ?? null;
+            if ($match) {
+                DB::table('product_variants')->where('id', $match->id)->update($fields);
+
+                continue;
+            }
+
+            $order++;
+            DB::table('product_variants')->insert($fields + [
+                'id' => (string) Str::uuid(),
+                'product_id' => $productId,
+                'sku' => null,
+                'sort_order' => $order,
+                'created_at' => $now,
+            ]);
+        }
+
+        // The product's option list is what the storefront draws its chooser from, so keep it in step.
+        $values = DB::table('product_variants')->where('product_id', $productId)->orderBy('sort_order')->pluck('title')->all();
+        DB::table('products')->where('id', $productId)->update([
+            'options' => json_encode([['name' => $optionName, 'values' => array_values(array_unique($values))]], JSON_UNESCAPED_UNICODE),
+            'updated_at' => $now,
+        ]);
+    }
+
     public function runImport(string $csv, string $mode): array
     {
         ['validated' => $validated, 'fileErrors' => $fileErrors] = $this->validateRows($csv, $mode);
@@ -573,6 +647,10 @@ final class BulkService
                             $imageWarnings[] = "{$url}: ".$e->getMessage();
                         }
                     }
+                }
+
+                if ($p['variants']) {
+                    $this->saveVariants($productId, $p['optionName'], $p['variants'], (float) $p['price'], $now);
                 }
 
                 $createdHere ? $created++ : $updated++;
