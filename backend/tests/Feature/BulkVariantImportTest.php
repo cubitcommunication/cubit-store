@@ -16,6 +16,13 @@ class BulkVariantImportTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // The importer only accepts a category and a material the store actually knows.
+        config(['shop.categories' => ['Plates'], 'shop.materials' => ['Bagasse']]);
+    }
+
     private function csv(string $variants): string
     {
         return Csv::build([[
