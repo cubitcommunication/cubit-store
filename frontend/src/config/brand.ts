@@ -18,6 +18,8 @@ type BrandFacts = {
   facebookUrl: string;
   websiteLabel: string;
   siteUrl: string;
+  /** The shop shoppers visit. Empty when this site is the shop; set when another website is. */
+  storefrontUrl: string;
   /** Money, dates and place (from the server's BRAND_* settings). */
   currencySymbol: string;
   locale: string;
@@ -39,6 +41,7 @@ const FALLBACK: BrandFacts = {
   facebookUrl: "",
   websiteLabel: typeof window !== "undefined" ? window.location?.host ?? "" : "",
   siteUrl: typeof window !== "undefined" ? window.location?.origin ?? "" : "",
+  storefrontUrl: "",
   // Only used when the server has not supplied them (dev server without the API, tests).
   currencySymbol: "₹",
   locale: "en-IN",

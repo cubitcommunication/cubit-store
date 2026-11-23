@@ -1,1 +1,0 @@
-import{t as e}from"./PageBlocks-CVN9dCwV.js";import{t}from"./page-defaults-hn-Ujk_j.js";import{t as n}from"./system-page-BAKy67Q0.js";import{t as r}from"./jsx-runtime-LKYXHABd.js";var i=r();function a(){let r=n(`home`)??t.home();return(0,i.jsx)(`div`,{className:`pb-24`,children:(0,i.jsx)(e,{blocks:r})})}export{a as component};

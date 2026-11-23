@@ -91,6 +91,21 @@ class StorefrontApiTest extends TestCase
         $this->assertSame(8, (int) DB::table('product_variants')->where('id', self::VARIANT)->value('stock_quantity'));
     }
 
+    public function test_a_cart_wide_discount_code_works_from_a_subtotal_alone(): void
+    {
+        $this->enable();
+        DB::table('coupons')->insert([
+            'id' => '00000000-0000-0000-0000-0000000000c1', 'code' => 'SAVE10',
+            'discount_type' => 'percentage', 'value' => 10, 'applies_to' => 'all', 'active' => 1,
+        ]);
+
+        $this->getJson('/api/public/coupon?code=SAVE10&subtotal=800&phone=9999900000', $this->headers())
+            ->assertOk()
+            ->assertJsonPath('ok', true)
+            ->assertJsonPath('code', 'SAVE10')
+            ->assertJsonPath('discount', 80);
+    }
+
     public function test_an_unknown_product_does_not_become_an_order(): void
     {
         $this->enable();

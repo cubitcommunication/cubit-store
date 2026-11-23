@@ -1,0 +1,1 @@
+import{t as e}from"./AdminShell-DenMydoo.js";import{t}from"./ProductForm-rmyLsr9K.js";import{t as n}from"./jsx-runtime-LKYXHABd.js";var r=n(),i=()=>(0,r.jsx)(e,{title:`Add product`,back:{to:`/admin/products`,label:`Products`},children:(0,r.jsx)(t,{})});export{i as component};

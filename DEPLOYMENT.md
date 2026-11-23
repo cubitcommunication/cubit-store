@@ -230,6 +230,9 @@ FEATURE_EXTERNAL_STOREFRONT=true
 STOREFRONT_API_ORIGINS=https://example.com,https://www.example.com
 ```
 
+Any `.env` value that contains a space has to be quoted — `SHOP_MATERIALS="Bagasse, Wood"`. An unquoted one stops
+the site from starting at all, with a 500 and nothing in the log, because it fails before the app boots.
+
 List every origin the browser may send, with scheme and without a trailing slash (`https://example.com` and
 `https://www.example.com` are two different origins). A request from any other website is refused, and the CORS
 headers are sent only to the ones listed.

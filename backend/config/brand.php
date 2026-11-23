@@ -30,6 +30,13 @@ return [
     'timezone' => (string) env('BRAND_TIMEZONE', 'Asia/Kolkata'),
     'country' => (string) env('BRAND_COUNTRY', 'India'),
 
+    /*
+     | Where shoppers actually buy. Normally this site itself, so leave it blank. Set it only when the storefront is
+     | a separate website that uses this one as its backend (see the external storefront API): the admin panel's
+     | "View store" link then opens the real shop instead of this install's own front page.
+     */
+    'storefront_url' => rtrim((string) env('BRAND_STOREFRONT_URL', ''), '/'),
+
     'instagram_handle' => (string) env('BRAND_INSTAGRAM_HANDLE', ''),
     'instagram_url' => (string) env('BRAND_INSTAGRAM_URL', ''),
     'facebook_label' => (string) env('BRAND_FACEBOOK_LABEL', ''),

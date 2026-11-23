@@ -1,1 +1,0 @@
-import{t as e}from"./useLoaderData-sgmTICw_.js";import{o as t}from"./site-settings--lNBTguW.js";var n={logo:`brand_logo_url`,dark:`brand_logo_dark_url`},r=/^\/[\w\-./]*$|^https:\/\/[\w\-./%?=&:]+$/,i=e=>e&&r.test(e)?e:null;function a(e){let r=t(e);return{logo:i(r[n.logo]),dark:i(r[n.dark])}}function o(){return a(e({from:`__root__`})?.siteSettings)}export{a as n,o as r,n as t};
