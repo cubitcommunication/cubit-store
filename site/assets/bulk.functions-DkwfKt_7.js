@@ -1,0 +1,1 @@
+import{n as e}from"./api-5lHwSwKm.js";var t=({data:t})=>e(`/admin/bulk/export`,{method:`POST`,body:t}),n=({data:t})=>e(`/admin/bulk/preview`,{method:`POST`,body:t}),r=({data:t})=>e(`/admin/bulk/commit`,{method:`POST`,body:t});export{t as n,n as r,r as t};

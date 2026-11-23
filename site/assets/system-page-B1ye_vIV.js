@@ -1,0 +1,1 @@
+import{t as e}from"./useQuery-Bk2pr1Qd.js";import{Ct as t}from"./index-Db-bhuUn.js";function n(n){let{data:r}=e(t(n));return r?.blocks?.length?r.blocks:null}export{n as t};

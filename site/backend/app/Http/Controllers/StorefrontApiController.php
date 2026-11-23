@@ -66,8 +66,17 @@ final class StorefrontApiController
     {
         $code = (string) $request->query('code', '');
         $subtotal = max(0.0, (float) $request->query('subtotal', 0));
-        // Product- and category-scoped codes need to know what is in the cart; cart-wide codes do not.
-        $lines = $request->has('items') ? $this->resolve((array) $request->input('items', []))['lines'] : [];
+
+        /*
+         * Coupons are scored against the cart's lines. A site that sends its items gets an exact answer,
+         * including codes limited to certain products or categories. A site that sends only a subtotal gets
+         * one stand-in line worth that subtotal: a cart-wide code then works, and a code limited to particular
+         * products is refused, which is the honest answer when the items are unknown.
+         */
+        $lines = $request->has('items')
+            ? $this->resolve((array) $request->input('items', []))['lines']
+            : [['id' => '', 'issue' => null, 'compareAt' => null, 'category' => '', 'material' => '',
+                'tags' => [], 'lineTotal' => $subtotal, 'qty' => 1]];
 
         $result = Coupons::evaluate($code, $lines, $subtotal, $this->emailFor((string) $request->query('phone', '')), null);
 
@@ -147,7 +156,7 @@ final class StorefrontApiController
     /**
      * Turns the external site's `{id, q, n}` lines into the product and variant ids this app works with.
      *
-     * @return array{items: array<int, array{id: string, variant: ?string, qty: int}>, lines: array<int, array{id: string, qty: int}>, problems: string[]}
+     * @return array{items: array<int, array{id: string, variant: ?string, qty: int}>, lines: array<int, array<string, mixed>>, problems: string[]}
      */
     private function resolve(array $raw): array
     {
@@ -169,7 +178,7 @@ final class StorefrontApiController
             $product = DB::table('products')
                 ->where('published', 1)->whereNull('archived_at')
                 ->where(fn ($q) => $q->where('slug', $slug)->orWhere('sku', $slug))
-                ->first(['id', 'name']);
+                ->first(['id', 'name', 'category', 'material']);
             if (! $product) {
                 $problems[] = $slug;
 
@@ -189,7 +198,11 @@ final class StorefrontApiController
             }
 
             $items[] = ['id' => $product->id, 'variant' => $variantId, 'qty' => $count];
-            $lines[] = ['id' => $product->id, 'qty' => $count];
+            $lines[] = [
+                'id' => $product->id, 'qty' => $count, 'issue' => null, 'compareAt' => null,
+                'category' => $product->category, 'material' => $product->material, 'tags' => [],
+                'lineTotal' => 0.0,
+            ];
         }
 
         return ['items' => $items, 'lines' => $lines, 'problems' => $problems];

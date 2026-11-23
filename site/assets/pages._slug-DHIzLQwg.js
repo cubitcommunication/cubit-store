@@ -1,1 +1,0 @@
-import{t as e}from"./PageBlocks-CVN9dCwV.js";import{u as t}from"./index-DQE2fyTA.js";import{t as n}from"./jsx-runtime-LKYXHABd.js";var r=n();function i(){let{page:n}=t.useLoaderData();return(0,r.jsxs)(`div`,{className:`pb-24`,children:[(0,r.jsx)(`h1`,{className:`sr-only`,children:n.title}),(0,r.jsx)(e,{blocks:n.blocks??[]})]})}export{i as component};

@@ -1,1 +1,0 @@
-import{t as e}from"./queryOptions-Dfvzj6n2.js";import{t}from"./query-B_t75h-p.js";import{r as n}from"./site-settings--lNBTguW.js";var r=r=>e({queryKey:[`admin`,`site-settings`,r],queryFn:async()=>{let{data:e,error:i}=await t.from(`site_settings`).select(n).eq(`group_name`,r).order(`sort_order`,{ascending:!0});if(i)throw i;return e??[]}});export{r as t};
