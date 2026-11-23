@@ -16,7 +16,69 @@ final class Csv
         'Short Description', 'Description', 'Where to Wear', 'Occasions', 'Visibility', 'Featured',
         'New Arrival', 'SEO Title', 'SEO Description', 'Social Image URL',
         'Primary Image URL', 'Additional Image URLs', 'Image Alt Text', 'WhatsApp Enquiry Message',
+        'Option Name', 'Variants',
     ];
+
+    /**
+     * Parses the Variants cell: one variant per `;`, its fields separated by `|`.
+     *
+     *   25 | 199 | 275 | 120 ; 50 | 380 | 500 ; 100 | 699 | 940 |
+     *   value | price | MRP | stock in hand
+     *
+     * Only the value is required. A blank price means the product's own price, a blank MRP means no
+     * strike-through, and a blank stock means this variant's stock is not tracked.
+     *
+     * @return array{variants: array<int, array{value: string, price: ?float, mrp: ?float, stock: ?int}>, errors: string[]}
+     */
+    public static function parseVariants(string $cell): array
+    {
+        $variants = [];
+        $errors = [];
+        $seen = [];
+
+        foreach (explode(';', $cell) as $chunk) {
+            if (trim($chunk) === '') {
+                continue;
+            }
+            $parts = array_map('trim', explode('|', $chunk));
+            $value = $parts[0] ?? '';
+            if ($value === '') {
+                $errors[] = 'A variant has no name.';
+
+                continue;
+            }
+            $key = mb_strtolower($value);
+            if (isset($seen[$key])) {
+                $errors[] = "Variant \"{$value}\" is listed twice.";
+
+                continue;
+            }
+            $seen[$key] = true;
+
+            $number = function (string $field, int $at) use ($parts, $value, &$errors): ?float {
+                $raw = $parts[$at] ?? '';
+                if ($raw === '') {
+                    return null;
+                }
+                if (! is_numeric($raw) || (float) $raw < 0) {
+                    $errors[] = "Variant \"{$value}\": {$field} must be a number.";
+
+                    return null;
+                }
+
+                return (float) $raw;
+            };
+
+            $variants[] = [
+                'value' => $value,
+                'price' => $number('price', 1),
+                'mrp' => $number('MRP', 2),
+                'stock' => ($stock = $number('stock', 3)) === null ? null : (int) $stock,
+            ];
+        }
+
+        return ['variants' => $variants, 'errors' => $errors];
+    }
 
     /** Rows whose product name starts with this marker are never imported. */
     public const EXAMPLE_MARKER = 'EXAMPLE';
