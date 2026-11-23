@@ -93,9 +93,23 @@ final class AbandonedCarts
         return DB::table('abandoned_carts')->where('token', $token)->update(['status' => 'unsubscribed', 'updated_at' => self::now()]) > 0;
     }
 
+    /**
+     * True when this cart has no real e-mail address: a shop whose checkout collects only a phone number gets a
+     * stand-in address built from it (see the external storefront API), and mail sent there would only bounce.
+     */
+    public static function isStandInEmail(?string $email): bool
+    {
+        $domain = trim((string) config('shop.storefront_api.phone_email_domain', ''));
+
+        return $domain !== '' && str_ends_with(strtolower((string) $email), '@'.strtolower($domain));
+    }
+
     /** Sends reminder number $n (1-3) of a cart now. */
     public static function sendReminder(object $cart, int $n): bool
     {
+        if (self::isStandInEmail($cart->email)) {
+            return false; // the store is still alerted; there is simply nobody to write to
+        }
         $ok = Mailer::send('abandoned_'.$n, $cart->email, MailVars::cart($cart));
         if ($ok) {
             DB::table('abandoned_carts')->where('id', $cart->id)->update(['status' => 'reminded', 'reminders_sent' => max((int) $cart->reminders_sent, $n), 'last_reminder_at' => self::now(), 'updated_at' => self::now()]);

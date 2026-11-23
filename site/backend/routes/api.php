@@ -46,7 +46,9 @@ Route::get('/public/img/{path}', PublicImageController::class)->where('path', '.
 */
 Route::middleware('storefront-api')->prefix('public')->group(function () {
     Route::get('/products', [\App\Http\Controllers\StorefrontApiController::class, 'products'])->middleware('throttle:query');
+    Route::get('/storefront.js', [\App\Http\Controllers\StorefrontApiController::class, 'script'])->middleware('throttle:query');
     Route::get('/coupon', [\App\Http\Controllers\StorefrontApiController::class, 'coupon'])->middleware('throttle:query');
+    Route::post('/cart', [\App\Http\Controllers\StorefrontApiController::class, 'cart'])->middleware('throttle:checkout');
     Route::post('/order', [\App\Http\Controllers\StorefrontApiController::class, 'order'])->middleware('throttle:checkout');
 });
 
